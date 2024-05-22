@@ -1,0 +1,20 @@
+diff --git a/dist/structures/MessageCollector.js b/dist/structures/MessageCollector.js
+index 434ac159e10e882796aa67d1baeca76a8bf73da2..1720d40febbd3bbbf19015cc31572c500a04dd6e 100644
+--- a/dist/structures/MessageCollector.js
++++ b/dist/structures/MessageCollector.js
+@@ -47,6 +47,7 @@ class MessageCollector extends Collector_1.default {
+         this.handleThreadDeletion = this.handleThreadDeletion.bind(this);
+         this.handleGuildDeletion = this.handleGuildDeletion.bind(this);
+         this.client.on('messageCreate', this.handleCollect);
++        this.client.on('messageUpdate', this.handleCollect);
+         this.client.on('messageDelete', this.handleDispose);
+         this.client.on('messageDeleteBulk', bulkDeleteListener);
+         this.client.on('channelDelete', this.handleChannelDeletion);
+@@ -54,6 +55,7 @@ class MessageCollector extends Collector_1.default {
+         this.client.on('guildDelete', this.handleGuildDeletion);
+         this.once('end', () => {
+             this.client.removeListener('messageCreate', this.handleCollect);
++            this.client.removeListener('messageUpdate', this.handleCollect);
+             this.client.removeListener('messageDelete', this.handleDispose);
+             this.client.removeListener('messageDeleteBulk', bulkDeleteListener);
+             this.client.removeListener('channelDelete', this.handleChannelDeletion);

@@ -1,0 +1,30 @@
+{
+    "main": "dist/index.js",
+    "type": "module",
+    "scripts": {
+        "build": "node build.js",
+        "lint": "tsc && eslint .",
+        "start": "node build.js && node ."
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.2.0",
+        "@types/node": "^20.12.12",
+        "esbuild": "^0.21.3",
+        "eslint": "^8.57.0",
+        "eslint-plugin-simple-import-sort": "^12.1.0",
+        "eslint-plugin-unused-imports": "^3.2.0",
+        "prisma": "^5.14.0",
+        "typescript": "^5.4.5",
+        "typescript-eslint": "^7.9.0"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.14.0",
+        "oceanic-collectors": "^1.0.7",
+        "oceanic.js": "^1.11.0"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "oceanic-collectors@1.0.7": "patches/oceanic-collectors@1.0.7.patch"
+        }
+    }
+}

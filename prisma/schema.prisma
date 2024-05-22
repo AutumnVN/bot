@@ -1,0 +1,85 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id          String       @id @unique
+    profile     Profile?
+    horse       Horse?
+    profession  Profession?
+    idleProfile IdleProfile?
+    reminder    Reminder[]
+}
+
+model Profile {
+    id         String @id @unique
+    level      Int
+    area       String
+    maxArea    String
+    timeTravel Int
+    coolness   Int
+    user       User   @relation(fields: [id], references: [id])
+}
+
+model Horse {
+    id       String @id @unique
+    tier     Int
+    type     String
+    level    Int
+    epicness Int
+    user     User   @relation(fields: [id], references: [id])
+}
+
+model Profession {
+    id        String @id @unique
+    worker    Int
+    crafter   Int
+    lootboxer Int
+    merchant  Int
+    enchanter Int
+    user      User   @relation(fields: [id], references: [id])
+}
+
+model IdleProfile {
+    id   String @id @unique
+    pack Int
+    user User   @relation(fields: [id], references: [id])
+}
+
+model IdleLeague {
+    username String @id @unique
+    point    Int
+}
+
+model IdleItem {
+    name       String  @id @unique
+    pack       Int?
+    type       String?
+    price      Int?
+    percent    Int?
+    note       String?
+    lastUpdate Float?
+}
+
+model Reminder {
+    id        String @id @unique
+    userID    String
+    channelID String
+    time      Float
+    message   String
+    user      User   @relation(fields: [userID], references: [id])
+}
+
+model VoidReminder {
+    area String @id @unique
+    time Float
+}
+
+model RestartChannel {
+    id String @id @unique
+}
