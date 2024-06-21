@@ -116,19 +116,19 @@ export class Inventory implements InventoryContent {
 
             this.normieFish += Math.floor(logs / tradeRate.fish);
             this.woodenLog = logs % tradeRate.fish;
-            if (this.normieFish <= 25e9) return;
+            if (this.normieFish <= 24999999999) return;
 
-            const normieFishExcess = this.normieFish - (25e9 - 15);
-            this.normieFish = 25e9 - 15;
+            const normieFishExcess = this.normieFish - (24999999999 - 15);
+            this.normieFish = 24999999999 - 15;
             this.goldenFish += Math.floor(normieFishExcess / 15 * this.craftProfit);
             this.normieFish += normieFishExcess % 15;
-            if (this.goldenFish <= 25e9) return;
+            if (this.goldenFish <= 24999999999) return;
 
-            const goldenFishExcess = this.goldenFish - (25e9 - 100);
-            this.goldenFish = 25e9 - 100;
+            const goldenFishExcess = this.goldenFish - (24999999999 - 100);
+            this.goldenFish = 24999999999 - 100;
             this.epicFish += Math.floor(goldenFishExcess / 100 * this.craftProfit);
             this.goldenFish += goldenFishExcess % 100;
-            this.epicFish = Math.min(this.epicFish, 25e9);
+            this.epicFish = Math.min(this.epicFish, 24999999999);
         }
 
         if (tradeRate.best === 'log') {
@@ -136,25 +136,25 @@ export class Inventory implements InventoryContent {
             this.normieFish = this.goldenFish = this.epicFish = this.apple = this.banana = this.ruby = 0;
 
             this.woodenLog += logs;
-            if (this.woodenLog <= 25e9) return;
+            if (this.woodenLog <= 24999999999) return;
 
-            const woodenLogExcess = this.woodenLog - (25e9 - 25);
-            this.woodenLog = 25e9 - 25;
+            const woodenLogExcess = this.woodenLog - (24999999999 - 25);
+            this.woodenLog = 24999999999 - 25;
             this.epicLog += Math.floor(woodenLogExcess / 25 * this.craftProfit);
             this.woodenLog += woodenLogExcess % 25;
-            if (this.epicLog <= 25e9) return;
+            if (this.epicLog <= 24999999999) return;
 
-            const epicLogExcess = this.epicLog - (25e9 - 10);
-            this.epicLog = 25e9 - 10;
+            const epicLogExcess = this.epicLog - (24999999999 - 10);
+            this.epicLog = 24999999999 - 10;
             this.superLog += Math.floor(epicLogExcess / 10 * this.craftProfit);
             this.epicLog += epicLogExcess % 10;
-            if (this.superLog <= 25e9) return;
+            if (this.superLog <= 24999999999) return;
 
-            const superLogExcess = this.superLog - (25e9 - 10);
-            this.superLog = 25e9 - 10;
+            const superLogExcess = this.superLog - (24999999999 - 10);
+            this.superLog = 24999999999 - 10;
             this.megaLog += Math.floor(superLogExcess / 10 * this.craftProfit);
             this.superLog += superLogExcess % 10;
-            this.megaLog = Math.min(this.megaLog, 25e9);
+            this.megaLog = Math.min(this.megaLog, 24999999999);
         }
 
         if (tradeRate.best === 'apple') {
@@ -168,19 +168,19 @@ export class Inventory implements InventoryContent {
 
             this.apple += Math.floor(logs / tradeRate.apple);
             this.woodenLog = logs % tradeRate.apple;
-            if (this.apple <= 25e9) return;
+            if (this.apple <= 24999999999) return;
 
-            const appleExcess = this.apple - (25e9 - 15);
-            this.apple = 25e9 - 15;
+            const appleExcess = this.apple - (24999999999 - 15);
+            this.apple = 24999999999 - 15;
             this.banana += Math.floor(appleExcess / 15 * this.craftProfit);
             this.apple += appleExcess % 15;
-            if (this.banana <= 25e9) return;
+            if (this.banana <= 24999999999) return;
 
-            const bananaExcess = this.banana - 25e9;
-            this.banana = 25e9;
+            const bananaExcess = this.banana - 24999999999;
+            this.banana = 24999999999;
             this.ruby += Math.floor(bananaExcess * 15 * tradeRate.apple / tradeRate.ruby);
             this.woodenLog += bananaExcess * 15 * tradeRate.apple % tradeRate.ruby;
-            this.ruby = Math.min(this.ruby, 25e9);
+            this.ruby = Math.min(this.ruby, 24999999999);
         }
 
         if (tradeRate.best === 'ruby') {
