@@ -1,5 +1,6 @@
 export const PREFIX = 'c';
 export const EPICRPG_ID = '555955826880413696';
+export const IDLEFARM_ID = '1085406806492319784';
 export const CHECK_INTERVAL = 60000;
 
 export const EMOJI: Record<string, string> = {

@@ -44,6 +44,11 @@ model Profession {
     user      User   @relation(fields: [id], references: [id])
 }
 
+model IdleLeague {
+    username String @id @unique
+    point    Int
+}
+
 model Reminder {
     id        String @id @unique
     userID    String
