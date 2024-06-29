@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-    id         String      @id @unique
-    profile    Profile?
-    horse      Horse?
-    profession Profession?
-    reminder   Reminder[]
+    id          String       @id @unique
+    profile     Profile?
+    horse       Horse?
+    profession  Profession?
+    idleProfile IdleProfile?
+    reminder    Reminder[]
 }
 
 model Profile {
@@ -44,9 +45,25 @@ model Profession {
     user      User   @relation(fields: [id], references: [id])
 }
 
+model IdleProfile {
+    id   String @id @unique
+    pack Int
+    user User   @relation(fields: [id], references: [id])
+}
+
 model IdleLeague {
     username String @id @unique
     point    Int
+}
+
+model IdleItem {
+    name       String  @id @unique
+    pack       Int?
+    type       String?
+    price      Int?
+    percent    Int?
+    note       String?
+    lastUpdate Float?
 }
 
 model Reminder {
