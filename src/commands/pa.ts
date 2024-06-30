@@ -2,7 +2,7 @@ import { IdleItem } from '@prisma/client';
 
 import { defineCommand } from '../Command';
 import { prisma } from '../Prisma';
-import { numberFormat, reply } from '../utils';
+import { itemList, reply } from '../utils';
 
 defineCommand({
     name: 'pa',
@@ -26,31 +26,14 @@ defineCommand({
         const material = await prisma.idleItem.findMany({ where: { type: 'material' } });
         const refined = await prisma.idleItem.findMany({ where: { type: 'refined' } });
         const product = await prisma.idleItem.findMany({ where: { type: 'product' } });
-        const materialProfit = material.map(item => ({ name: item.name, profit: profit(item) })).sort((a, b) => b.profit - a.profit);
-        const refinedProfit = refined.map(item => ({ name: item.name, profit: profit(item) })).sort((a, b) => b.profit - a.profit);
-        const productProfit = product.map(item => ({ name: item.name, profit: profit(item) })).sort((a, b) => b.profit - a.profit);
+        const materialProfit = material.map(item => ({ ...item, price: profit(item) })).sort((a, b) => b.price - a.price).slice(0, 3);
+        const refinedProfit = refined.map(item => ({ ...item, price: profit(item) })).sort((a, b) => b.price - a.price).slice(0, 3);
+        const productProfit = product.map(item => ({ ...item, price: profit(item) })).sort((a, b) => b.price - a.price).slice(0, 3);
 
         let content = `Tax: **${tax * 100}%**\nMultiplier: **x${multiplier}**\n`;
-        content += '\n**Material**:\n';
-
-        for (let i = 0; i < 3; i++) {
-            const item = materialProfit[i];
-            content += `${i + 1}. **${item.name}**: ${numberFormat(item.profit)}\n`;
-        }
-
-        content += '\n**Refined**:\n';
-
-        for (let i = 0; i < 3; i++) {
-            const item = refinedProfit[i];
-            content += `${i + 1}. **${item.name}**: ${numberFormat(item.profit)}\n`;
-        }
-
-        content += '\n**Product**:\n';
-
-        for (let i = 0; i < 3; i++) {
-            const item = productProfit[i];
-            content += `${i + 1}. **${item.name}**: ${numberFormat(item.profit)}\n`;
-        }
+        content += `\n**Material**\n${itemList(materialProfit)}`;
+        content += `**Refined**\n${itemList(refinedProfit)}`;
+        content += `**Product**\n${itemList(productProfit)}`;
 
         await reply(message, content);
 
