@@ -8,9 +8,6 @@ client.on('messageCreate', async message => {
     if (message.author.id !== IDLEFARM_ID) return;
     if (!message.embeds[0]?.author?.name.endsWith(' — inventory')) return;
 
-    const id = message.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0];
-    if (!id) return;
-
     const { fields } = message.embeds[0];
     if (!fields) return;
 
