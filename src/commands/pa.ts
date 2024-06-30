@@ -15,11 +15,7 @@ defineCommand({
         const outdated = await prisma.idleItem.findMany({
             where: {
                 lastUpdate: { lt: today0UTC },
-                OR: [
-                    { type: 'material' },
-                    { type: 'refined' },
-                    { type: 'product' }
-                ]
+                type: { in: ['material', 'refined', 'product'] }
             }
         });
         if (outdated.length) return reply(message, `Outdated item:\n${outdated.map(item => item.name).join(', ')}`);

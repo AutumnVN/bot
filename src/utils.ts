@@ -1,4 +1,4 @@
-import { Reminder } from '@prisma/client';
+import { IdleItem, Reminder } from '@prisma/client';
 import { exec } from 'child_process';
 import { CreateMessageOptions, Message } from 'oceanic.js';
 import { promisify } from 'util';
@@ -92,4 +92,38 @@ export async function execAsync(command: string) {
         if (!(error instanceof Error)) return '';
         return error.message;
     }
+}
+
+export function itemList(items: IdleItem[]) {
+    const [longestName, longestPrice, longestPercent] = items.reduce((acc, item) => {
+        if (!item.price || !item.percent) throw new Error(`${item.name} has no price or percent`);
+        const name = item.name.length;
+        const price = numberFormat(item.price).length;
+        const plus = item.percent > 0 ? '+' : '';
+        const percent = (plus + percentFormat(item.percent / 100)).length;
+
+        acc[0] = Math.max(acc[0], name);
+        acc[1] = Math.max(acc[1], price);
+        acc[2] = Math.max(acc[2], percent);
+
+        return acc;
+    }, [0, 0, 0]);
+
+    const content = items.map(item => {
+        if (!item.price || !item.percent) throw new Error(`${item.name} has no price or percent`);
+        const paddedName = item.name.padEnd(longestName, ' ');
+        const paddedPrice = numberFormat(item.price).padStart(longestPrice, ' ');
+        const plus = item.percent > 0 ? '+' : '';
+        const paddedPercent = (plus + percentFormat(item.percent / 100)).padStart(longestPercent, ' ');
+
+        return `${bold.blue(paddedName)}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)}`;
+    }).join('\n');
+
+    return codeBlock(content, 'ansi');
+}
+
+function colorPrice(percent: number, paddedPercent: string) {
+    if (percent > 0) return color.chartreuse(paddedPercent);
+    if (percent < 0) return color.red(paddedPercent);
+    return color.gray(paddedPercent);
 }
