@@ -3,9 +3,9 @@ import { reply } from '../utils';
 
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
-    if (!/^[ \d+*/^().-]+$/.test(message.content)) return;
+    if (!/^[ ,\d+*/^().-]+$/.test(message.content)) return;
 
-    const expression = message.content.replace(/ /g, '');
+    const expression = message.content.replace(/[ ,]/g, '');
     if (!isNaN(Number(expression))) return;
     if (/\.\D/.test(expression)) return;
     if (/\.\d+\./.test(expression)) return;
