@@ -33,7 +33,7 @@ client.on('messageCreate', async message => {
 
             const type = ['flashlight', 'clock'].includes(name) ? 'assembly'
                 : name.endsWith('scythe') ? 'tool' : undefined;
-            const note = field.name.match(/⚠️ .+$/)?.[0]?.replace(/\*/g, '');
+            const note = field.name.match(/⚠️ .+$/)?.[0]?.replace(/\*/g, '') || '';
             const price = Number(field.value.match(/(?<=\*\*Price\*\*: )[\d,]+/)?.[0]?.replace(/,/g, ''));
             const percent = Number(field.value.match(/(?<=`)[+-]?\d+(?=%`)/)?.[0]);
 
