@@ -116,7 +116,7 @@ export function itemList(items: IdleItem[]) {
         const plus = item.percent > 0 ? '+' : '';
         const paddedPercent = (plus + percentFormat(item.percent / 100)).padStart(longestPercent, ' ');
 
-        return `${bold.blue(paddedName)}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)}`;
+        return `${bold.blue(paddedName)}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)} ${item.note ?? ''}`;
     }).join('\n');
 
     return codeBlock(content, 'ansi');
