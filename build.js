@@ -11,7 +11,8 @@ await build({
     packages: 'external',
     format: 'esm',
     target: 'esnext',
-    platform: 'node'
+    platform: 'node',
+    logLevel: 'error'
 });
 
 /**

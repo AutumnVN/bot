@@ -11,6 +11,8 @@ export const client = new Client({
     }
 });
 
+client.setMaxListeners(30);
+
 export let ownerID: string;
 
 export function setOwnerID(id: string) {
