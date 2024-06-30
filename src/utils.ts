@@ -1,5 +1,7 @@
 import { Reminder } from '@prisma/client';
+import { exec } from 'child_process';
 import { CreateMessageOptions, Message } from 'oceanic.js';
+import { promisify } from 'util';
 
 import { ColorFormatter } from './class/ColorFormatter';
 import { client } from './Client';
@@ -8,7 +10,7 @@ import { prisma } from './Prisma';
 export function codeBlock(content: string, lang = '') {
     if (content === '') content = ' ';
 
-    return `\`\`\`${lang}\n${content}\`\`\``;
+    return `\`\`\`${lang}\n${content.replace(/`{3}/g, '\u200b`\u200b`\u200b`\u200b')}\`\`\``;
 }
 
 export function uploadAsFileIfTooLong(options: CreateMessageOptions) {
@@ -18,7 +20,7 @@ export function uploadAsFileIfTooLong(options: CreateMessageOptions) {
         const lang = options.content.match(/(?<=^`{3})\w{0,14}(?=\n)/)?.[0];
 
         if (lang !== undefined && options.content.endsWith('```')) {
-            options.content = options.content.slice(3 + lang.length + 1, -3);
+            options.content = options.content.slice(3 + lang.length + 1, -3).replace(/\u200b`\u200b`\u200b`\u200b/g, '```');
         }
 
         options.files ??= [];
@@ -78,4 +80,16 @@ export function scheduleReminder(reminder: Reminder) {
         await send(reminder.channelID, `<@${reminder.userID}> Reminder for: **${reminder.message}**`);
         await prisma.reminder.delete({ where: { id: reminder.id } });
     }, reminder.time - Date.now());
+}
+
+const promisifiedExec = promisify(exec);
+
+export async function execAsync(command: string) {
+    try {
+        const { stdout, stderr } = await promisifiedExec(command, { timeout: 30000 });
+        return stdout + stderr;
+    } catch (error) {
+        if (!(error instanceof Error)) return '';
+        return error.message;
+    }
 }

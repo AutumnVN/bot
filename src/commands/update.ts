@@ -1,27 +1,31 @@
 
-import { exec } from 'child_process';
 
 import { defineCommand } from '../Command';
 import { prisma } from '../Prisma';
-import { codeBlock, reply } from '../utils';
+import { codeBlock, execAsync, reply, send } from '../utils';
 
 defineCommand({
     name: 'update',
     description: 'Pull changes and restart',
     ownerOnly: true,
-    run(message, args) {
+    async run(message, args) {
         if (args.length) return;
 
-        exec('git pull --rebase', async (error, stdout, stderr) => {
-            const content = stdout + stderr;
+        const gitReset = await execAsync('git reset --hard @{u}');
+        await reply(message, codeBlock(gitReset));
 
-            await reply(message, codeBlock(content));
+        const gitPull = await execAsync('git pull');
+        await send(message.channelID, codeBlock(gitPull));
 
-            if (content.includes('Already up to date.')) return;
+        if (gitPull.includes('Already up to date.')) return;
 
-            await prisma.restartChannel.create({ data: { id: message.channelID } });
-            await reply(message, codeBlock(content) + '\nRestarting...');
-            process.exit(0);
-        });
+        if (gitPull.includes('schema.prisma')) {
+            const prismaGenerate = await execAsync('pnpm prisma generate');
+            await send(message.channelID, codeBlock(prismaGenerate));
+        }
+
+        await prisma.restartChannel.create({ data: { id: message.channelID } });
+        await send(message.channelID, 'Restarting...');
+        process.exit(0);
     }
 });

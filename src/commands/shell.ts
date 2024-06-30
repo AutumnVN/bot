@@ -1,7 +1,6 @@
-import { exec } from 'child_process';
 
 import { defineCommand } from '../Command';
-import { reply } from '../utils';
+import { codeBlock, execAsync, reply } from '../utils';
 
 defineCommand({
     name: 'shell',
@@ -10,12 +9,11 @@ defineCommand({
     usages: ['<command>'],
     ownerOnly: true,
     rawContent: true,
-    run(message, [command]) {
+    async run(message, [command]) {
         if (!command) return;
 
-        exec(command, async (error, stdout, stderr) => {
-            const content = stdout + stderr;
-            await reply(message, content);
-        });
+        const content = await execAsync(command);
+
+        await reply(message, codeBlock(content));
     }
 });
