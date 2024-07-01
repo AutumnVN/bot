@@ -20,6 +20,14 @@ client.on('messageCreate', async message => {
     await prisma.idleProfile.upsert({
         where: { id },
         update: { pack },
-        create: { id, pack }
+        create: {
+            pack,
+            user: {
+                connectOrCreate: {
+                    where: { id },
+                    create: { id }
+                }
+            }
+        }
     });
 });
