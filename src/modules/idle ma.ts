@@ -1,8 +1,14 @@
+import { Message } from 'oceanic.js';
+
 import { client } from '../Client';
 import { IDLEFARM_ID } from '../constants';
 import { prisma } from '../Prisma';
 
-client.on('messageCreate', async message => {
+client.on('messageCreate', idleMa);
+client.on('messageUpdate', idleMa);
+
+async function idleMa(message: Message) {
+    if (message.timestamp.getTime() < Date.now() - 120000) return;
     if (message.author.id !== IDLEFARM_ID) return;
     if (!message.embeds[0]?.description?.startsWith('This is the **idle market**')) return;
     if (message.embeds[0].fields?.[0]?.value === 'Raw items of low value') return;
@@ -44,4 +50,4 @@ client.on('messageCreate', async message => {
             });
         }
     }
-});
+}

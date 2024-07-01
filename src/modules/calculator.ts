@@ -1,7 +1,13 @@
+import { Message } from 'oceanic.js';
+
 import { client } from '../Client';
 import { reply } from '../utils';
 
-client.on('messageCreate', async message => {
+client.on('messageCreate', calculator);
+client.on('messageUpdate', calculator);
+
+async function calculator(message: Message) {
+    if (message.timestamp.getTime() < Date.now() - 120000) return;
     if (message.author.bot) return;
     if (!/^[ ,\d+*/^().-]+$/.test(message.content)) return;
 
@@ -18,7 +24,7 @@ client.on('messageCreate', async message => {
     if (isNaN(result)) return;
 
     await reply(message, result.toString());
-});
+}
 
 function plus(expression: string): number {
     const numbers = split(expression, '+').map(minus);

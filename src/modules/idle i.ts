@@ -1,10 +1,16 @@
 
+import { Message } from 'oceanic.js';
+
 import { client } from '../Client';
 import { IDLEFARM_ID } from '../constants';
 import { prisma } from '../Prisma';
 import { itemList, reply } from '../utils';
 
-client.on('messageCreate', async message => {
+client.on('messageCreate', idleI);
+client.on('messageUpdate', idleI);
+
+async function idleI(message: Message) {
+    if (message.timestamp.getTime() < Date.now() - 120000) return;
     if (message.author.id !== IDLEFARM_ID) return;
     if (!message.embeds[0]?.author?.name.endsWith(' — inventory')) return;
 
@@ -29,4 +35,4 @@ client.on('messageCreate', async message => {
     if (!idleItems.length) return;
 
     await reply(message, itemList(idleItems));
-});
+}
