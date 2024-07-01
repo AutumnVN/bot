@@ -13,6 +13,7 @@ client.on('messageCreate', async message => {
 
     const league = await prisma.idleLeague.findUnique({ where: { username } });
     const oldPoint = league?.point;
+    if (oldPoint === point) return;
 
     if (message.embeds[0].description?.startsWith('You were raided') && oldPoint) {
         let content = `**${username}** `;
