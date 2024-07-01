@@ -10,7 +10,7 @@ client.on('messageUpdate', command);
 function command(message: Message) {
     if (message.timestamp.getTime() < Date.now() - 120000) return;
     if (message.author.bot) return;
-    if (!message.content.startsWith(PREFIX)) return;
+    if (!message.content.toLowerCase().startsWith(PREFIX)) return;
 
     const commandText = message.content.slice(PREFIX.length).trim();
     const [name, ...args] = commandText.split(/\s+/);
