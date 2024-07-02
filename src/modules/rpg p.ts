@@ -63,7 +63,10 @@ client.on('messageCreate', async message => {
     const armorEnchant = armorText === 'No armor' ? armorText : armorText.match(/(?<=\[).+?(?=\])/)?.[0];
     if (!swordName || !swordEnchant || !armorName || !armorEnchant) return;
 
-    await reply(message, calculateMissingStats(area, level, atk, def, life, swordName, swordEnchant, armorName, armorEnchant, horse));
+    const content = calculateMissingStats(area, level, atk, def, life, swordName, swordEnchant, armorName, armorEnchant, horse);
+    if (!content) return;
+
+    await reply(message, content);
 });
 
 function getBaseStats(value: number, equipment: string, enchant: string, area: string, horse: Horse) {
