@@ -96,7 +96,7 @@ export async function execAsync(command: string) {
 
 export function itemList(items: IdleItem[]) {
     const [longestName, longestPrice, longestPercent] = items.reduce((acc, item) => {
-        if (!item.price || !item.percent) throw new Error(`${item.name} has no price or percent`);
+        if (item.price === null || item.percent === null) throw new Error(`${item.name} has no price or percent`);
         const name = item.name.length;
         const price = numberFormat(item.price).length;
         const plus = item.percent > 0 ? '+' : '';
@@ -110,7 +110,7 @@ export function itemList(items: IdleItem[]) {
     }, [0, 0, 0]);
 
     const content = items.map(item => {
-        if (!item.price || !item.percent) throw new Error(`${item.name} has no price or percent`);
+        if (item.price === null || item.percent === null) throw new Error(`${item.name} has no price or percent`);
         const paddedName = item.name.padEnd(longestName, ' ');
         const paddedPrice = numberFormat(item.price).padStart(longestPrice, ' ');
         const plus = item.percent > 0 ? '+' : '';
