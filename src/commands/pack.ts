@@ -29,7 +29,8 @@ defineCommand({
         let workerToken = 0;
         let idlon = 0;
 
-        await send(channelID, `\`idle i\` show **${workerTokenType}**`);
+        await send(channelID, 'idle i');
+        await send(channelID, `show **${workerTokenType}**`);
 
         const [idleInvMessage] = await awaitMessages(client, channel, {
             filter: m => m.author.id === IDLEFARM_ID
@@ -44,7 +45,7 @@ defineCommand({
         workerToken = Number(idleInvMessage.embeds[0].fields?.[1]?.value?.match(new RegExp(`(?<=\\*\\*${workerTokenType}\\*\\*: )[\\d,]+`))?.[0]?.replace(/,/g, ''));
         if (workerToken === 0) return send(channelID, `Out of **${workerTokenType}**`);
 
-        await send(channelID, '`idle p`');
+        await send(channelID, 'idle p');
 
         const [idleProfileMessage] = await awaitMessages(client, channel, {
             filter: m => m.author.id === IDLEFARM_ID
@@ -79,7 +80,7 @@ defineCommand({
                 return send(channelID, error.message);
             }
 
-            await send(channelID, `\`idle buy ${item.name} ${buyAmount}\``);
+            await send(channelID, `idle buy ${item.name} ${buyAmount}`);
 
             const [idleBuyMessage] = await awaitMessages(client, channel, {
                 filter: m => m.author.id === IDLEFARM_ID
@@ -93,7 +94,7 @@ defineCommand({
             const cost = Number(idleBuyMessage.content.match(/(?<=successfully bought for )[\d,]+/)?.[0]?.replace(/,/g, ''));
             idlon -= cost;
 
-            await send(channelID, `\`idle pa ${item.name} ${buyAmount / 100}\``);
+            await send(channelID, `idle pa ${item.name} ${buyAmount / 100}`);
 
             const [idlePaMessage] = await awaitMessages(client, channel, {
                 filter: m => m.author.id === IDLEFARM_ID
@@ -107,7 +108,7 @@ defineCommand({
             const boxName = idlePaMessage.content.match(/(?<=successfully converted into .+? \*\*).+?(?=\*\*!)/)?.[0];
             workerToken -= buyAmount / 100;
 
-            await send(channelID, `\`idle sell ${boxName} all\``);
+            await send(channelID, `idle sell ${boxName} all`);
 
             const [idleSellMessage] = await awaitMessages(client, channel, {
                 filter: m => m.author.id === IDLEFARM_ID
