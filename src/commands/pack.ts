@@ -27,12 +27,13 @@ defineCommand({
 
         const workerTokenType = item.type === 'material' ? 'worker tokens' : item.type === 'refined' ? 'rare worker tokens' : 'epic worker tokens';
         let workerToken = 0;
+        let leftoverItem = 0;
         let idlon = 0;
 
         await send(channelID, 'idle i');
         await send(channelID, `show **${workerTokenType}**`);
 
-        const [idleInvMessage] = await awaitMessages(client, channel, {
+        const [idleInvWorkerTokenMessage] = await awaitMessages(client, channel, {
             filter: m => m.author.id === IDLEFARM_ID
                 && !!m.embeds[0]?.author?.name.endsWith(' — inventory')
                 && m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id
@@ -40,10 +41,27 @@ defineCommand({
             max: 1,
             time: 60000
         });
-        if (!idleInvMessage) return;
+        if (!idleInvWorkerTokenMessage) return;
 
-        workerToken = Number(idleInvMessage.embeds[0].fields?.[1]?.value?.match(new RegExp(`(?<=\\*\\*${workerTokenType}\\*\\*: )[\\d,]+`))?.[0]?.replace(/,/g, ''));
+        workerToken = Number(idleInvWorkerTokenMessage.embeds[0].fields?.[1]?.value?.match(new RegExp(`(?<=\\*\\*${workerTokenType}\\*\\*: )[\\d,]+`))?.[0]?.replace(/,/g, ''));
         if (workerToken === 0) return send(channelID, `Out of **${workerTokenType}**`);
+
+        await send(channelID, `show **${itemName}**\nor type \`skip\` if you don't have any of it`);
+
+        const [idleInvItemMessage] = await awaitMessages(client, channel, {
+            filter: m => (m.author.id === IDLEFARM_ID
+                && !!m.embeds[0]?.author?.name.endsWith(' — inventory')
+                && m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id
+                && !!m.embeds[0].fields?.[1]?.value?.includes(`**${itemName}**:`))
+                || (m.author.id === message.author.id && m.content.toLowerCase() === 'skip'),
+            max: 1,
+            time: 60000
+        });
+        if (!idleInvItemMessage) return;
+
+        if (idleInvItemMessage.author.id === IDLEFARM_ID) {
+            leftoverItem = Number(idleInvItemMessage.embeds[0].fields?.[1]?.value?.match(new RegExp(`(?<=\\*\\*${itemName}\\*\\*: )[\\d,]+`))?.[0]?.replace(/,/g, ''));
+        }
 
         await send(channelID, 'idle p');
 
@@ -80,25 +98,35 @@ defineCommand({
                 return send(channelID, error.message);
             }
 
-            await send(channelID, `idle buy ${item.name} ${buyAmount}`);
+            const oldBuyAmount = buyAmount;
 
-            const [idleBuyMessage] = await awaitMessages(client, channel, {
-                filter: m => m.author.id === IDLEFARM_ID
-                    && m.content.startsWith(`<@${message.author.id}>, ${numberFormat(buyAmount)}`)
-                    && m.content.includes(`**${item.name}** successfully bought for`),
-                max: 1,
-                time: 60000
-            });
-            if (!idleBuyMessage) return;
+            if (buyAmount > leftoverItem) {
+                buyAmount -= leftoverItem;
+                leftoverItem = 0;
 
-            const cost = Number(idleBuyMessage.content.match(/(?<=successfully bought for )[\d,]+/)?.[0]?.replace(/,/g, ''));
-            idlon -= cost;
+                await send(channelID, `idle buy ${item.name} ${buyAmount}`);
 
-            await send(channelID, `idle pa ${item.name} ${buyAmount / 100}`);
+                const [idleBuyMessage] = await awaitMessages(client, channel, {
+                    filter: m => m.author.id === IDLEFARM_ID
+                        && m.content.startsWith(`<@${message.author.id}>, ${numberFormat(buyAmount)}`)
+                        && m.content.includes(`**${item.name}** successfully bought for`),
+                    max: 1,
+                    time: 60000
+                });
+                if (!idleBuyMessage) return;
+
+                const cost = Number(idleBuyMessage.content.match(/(?<=successfully bought for )[\d,]+/)?.[0]?.replace(/,/g, ''));
+                idlon -= cost;
+
+            } else {
+                leftoverItem -= buyAmount;
+            }
+
+            await send(channelID, `idle pa ${item.name} ${oldBuyAmount / 100}`);
 
             const [idlePaMessage] = await awaitMessages(client, channel, {
                 filter: m => m.author.id === IDLEFARM_ID
-                    && m.content.startsWith(`<@${message.author.id}>, ${numberFormat(buyAmount)}`)
+                    && m.content.startsWith(`<@${message.author.id}>, ${numberFormat(oldBuyAmount)}`)
                     && m.content.includes(`**${item.name}** successfully converted into`),
                 max: 1,
                 time: 60000
@@ -106,7 +134,7 @@ defineCommand({
             if (!idlePaMessage) return;
 
             const boxName = idlePaMessage.content.match(/(?<=successfully converted into .+? \*\*).+?(?=\*\*!)/)?.[0];
-            workerToken -= buyAmount / 100;
+            workerToken -= oldBuyAmount / 100;
 
             await send(channelID, `idle sell ${boxName} all`);
 
