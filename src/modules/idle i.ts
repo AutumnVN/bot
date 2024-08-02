@@ -4,7 +4,7 @@ import { Message } from 'oceanic.js';
 import { client } from '../Client';
 import { IDLEFARM_ID } from '../constants';
 import { prisma } from '../Prisma';
-import { itemList, reply } from '../utils';
+import { itemList, numberFormat, reply } from '../utils';
 
 client.on('messageCreate', idleI);
 client.on('messageUpdate', idleI);
@@ -14,10 +14,10 @@ async function idleI(message: Message) {
     if (message.author.id !== IDLEFARM_ID) return;
     if (!message.embeds[0]?.author?.name.endsWith(' — inventory')) return;
 
-    const packingField = message.embeds[0].fields?.find(field => field.name === '')?.value;
-    if (!packingField) return;
+    const invField = message.embeds[0].fields?.find(field => field.name === '')?.value;
+    if (!invField) return;
 
-    const invItems = packingField.match(/(?<=\*\*).+?(?=\*\*:)/g);
+    const invItems = invField.match(/(?<=\*\*).+?(?=\*\*:)/g);
     if (!invItems) return;
 
     const today0UTC = new Date().setUTCHours(0, 0, 0, 0);
@@ -32,7 +32,29 @@ async function idleI(message: Message) {
     if (!idleItems.length) return;
 
     try {
-        await reply(message, itemList(idleItems));
+        let totalDebt = '';
+
+        if (message.embeds[0].fields?.[0]?.name === '⚠️ Debt items') {
+            const invAmounts = invField.match(/(?<=\*\*.+?\*\*: -)[\d,]+/g)?.map(a => Number(a.replace(/,/g, '')));
+            if (!invAmounts) return;
+
+            const invDebt = invAmounts.map((amount, i) => {
+                const price = idleItems.find(item => item.name === invItems[i])?.price;
+                if (!price) throw new Error(`${invItems[i]} has no price`);
+                return amount * price;
+            });
+
+            totalDebt = `Total debt: ${numberFormat(invDebt.reduce((acc, debt) => acc + debt, 0))}\n`;
+
+            const longestDebt = Math.max(...invDebt.map(debt => numberFormat(debt).length));
+
+            idleItems.forEach(item => {
+                const index = invItems.indexOf(item.name);
+                item.note = `${numberFormat(invDebt[index]).padStart(longestDebt, ' ')}  ${item.note ?? ''}`;
+            });
+        }
+
+        await reply(message, totalDebt + itemList(idleItems));
     } catch (error) {
         if (!(error instanceof Error)) return;
         await reply(message, error.message);
