@@ -79,10 +79,13 @@ function getBaseStats(value: number, equipment: string, enchant: string, area: s
 
 function calculateMissingStats(area: string, level: number, atk: number, def: number, life: number, swordName: string, swordEnchant: string, armorName: string, armorEnchant: string, horse: Horse) {
     const cap = VOID_STAT_CAP[area];
+    const missingAtk = cap.atk - getBaseStats(atk, swordName, swordEnchant, area, horse);
+    const missingDef = cap.def - getBaseStats(def, armorName, armorEnchant, area, horse);
     const missingStats = {
         level: cap.level - level,
-        atk: cap.atk - getBaseStats(atk, swordName, swordEnchant, area, horse),
-        def: cap.def - getBaseStats(def, armorName, armorEnchant, area, horse),
+        atk: missingAtk,
+        def: missingDef,
+        apple_juice: Math.ceil(Math.max(missingAtk, missingDef) / 2),
         life: cap.life - life
     };
     let content = '';
@@ -93,17 +96,17 @@ function calculateMissingStats(area: string, level: number, atk: number, def: nu
         const missing = missingStats[stat as keyof typeof missingStats];
         if (missing <= 0) continue;
 
-        content += `Need **${missing}** more ${stat.toUpperCase()}`;
+        content += `Need **${missing}** more ${stat.replace(/_/g, ' ').toUpperCase()}`;
 
         if (missingStats.level <= 0) {
             content += '\n';
             continue;
         }
 
-        const multiplier = stat === 'life' ? 5 : 1;
+        const multiplier = stat === 'life' ? 5 : stat === 'apple_juice' ? 0.5 : 1;
 
         if (missing > missingStats.level * multiplier) {
-            content += ` (only **${missing - missingStats.level * multiplier}** more ${stat.toUpperCase()} if reach level ${cap.level})\n`;
+            content += ` (only **${Math.ceil(missing - missingStats.level * multiplier)}** more ${stat.replace(/_/g, ' ').toUpperCase()} if reach level ${cap.level})\n`;
         } else {
             content += ` (capped after reaching level ${level + Math.ceil(missing / multiplier)})\n`;
         }
