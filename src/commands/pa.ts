@@ -19,7 +19,8 @@ defineCommand({
         if (outdated.length) return reply(message, `Outdated item:\n${outdated.map(item => item.name).join(', ')}`);
 
         const profile = await prisma.idleProfile.findUnique({ where: { id: message.author.id } });
-        const tax = (Number(args[0]) || 10) / 100;
+        const defaultTax = [1, 2, 3, 4, 5].includes(new Date().getUTCDay()) ? 9 : 10;
+        const tax = (Number(args[0]) || defaultTax) / 100;
         const multiplier = 1 + (Number(args[1]) || profile?.pack || 0) / 800;
         const material = await prisma.idleItem.findMany({ where: { type: 'material' } });
         const refined = await prisma.idleItem.findMany({ where: { type: 'refined' } });
