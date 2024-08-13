@@ -16,7 +16,7 @@ async function calculator(message: Message) {
     if (/\.\D/.test(expression)) return;
     if (/\.\d+\./.test(expression)) return;
     if (/[+*/^-]([^(\d.]|$)/.test(expression)) return;
-    if (/[^)\d][*/^]/.test(expression)) return;
+    if (/(^|[^)\d])[*/^]/.test(expression)) return;
     if (/[\d.)]\(/.test(expression)) return;
     if (/\)[\d.(]/.test(expression)) return;
 
