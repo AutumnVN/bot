@@ -21,7 +21,9 @@ defineCommand({
         const profile = await prisma.idleProfile.findUnique({ where: { id: message.author.id } });
         const defaultTax = [1, 2, 3, 4, 5].includes(new Date().getUTCDay()) ? 9 : 10;
         const tax = (Number(args[0]) || defaultTax) / 100;
-        const multiplier = 1 + (Number(args[1]) || profile?.pack || 0) / 800;
+        if (tax > 0.1 || tax < 0.04) return reply(message, 'Tax must be between 4 and 10');
+
+        const multiplier = 1 + (Number(args[1]) || profile?.pack || 200) / 800;
         const material = await prisma.idleItem.findMany({ where: { type: 'material' } });
         const refined = await prisma.idleItem.findMany({ where: { type: 'refined' } });
         const product = await prisma.idleItem.findMany({ where: { type: 'product' } });
