@@ -23,8 +23,13 @@ const REMIND_INTERVALS = [
     { label: 'sealed', value: 0 },
 ];
 
+const voidReminderChannelIds: string[] = [];
+
+export function addVoidReminderChannel(id: string) {
+    if (!voidReminderChannelIds.includes(id) && id !== process.env.VOID_CHANNEL_ID) voidReminderChannelIds.push(id);
+}
+
 client.once('ready', async () => {
-    if (!process.env.VOID_CHANNEL_ID) return;
     const { VOID_CHANNEL_ID } = process.env;
 
     await (async function reminder() {
@@ -38,9 +43,10 @@ client.once('ready', async () => {
                 }
             });
 
-            reminders.forEach(reminder => setTimeout(async () => {
+            reminders.forEach(reminder => setTimeout(() => {
                 const content = label === 'sealed' ? `**Area ${reminder.area}** is **SEALED**!` : `**Area ${reminder.area}** will be sealed in **${label}**!`;
-                await send(VOID_CHANNEL_ID, content);
+                [VOID_CHANNEL_ID, ...voidReminderChannelIds].forEach(channelId => channelId && send(channelId, content));
+                if (label === 'sealed') voidReminderChannelIds.length = 0;
             }, reminder.time - value - Date.now()));
         }
 

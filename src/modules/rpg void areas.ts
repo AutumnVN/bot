@@ -1,6 +1,7 @@
 import { client } from '../Client';
 import { EPICRPG_ID } from '../constants';
 import { prisma } from '../Prisma';
+import { addVoidReminderChannel } from './voidReminder';
 
 const regex = /(\d+)d (\d+)h (\d+)m (\d+)s/;
 const timeUnits = [86400000, 3600000, 60000, 1000];
@@ -14,6 +15,10 @@ client.on('messageCreate', async message => {
 
     for (const { name, value } of voidAreasField) {
         if (!value.includes('Unsealed')) continue;
+
+        if (value.includes('0d 0h') && message.channel?.id) {
+            addVoidReminderChannel(message.channel.id);
+        }
 
         const area = name.match(/\d+/)?.[0];
         if (!area) continue;
