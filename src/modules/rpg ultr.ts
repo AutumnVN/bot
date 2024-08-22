@@ -4,6 +4,7 @@ import { reply } from '../utils';
 
 client.on('messageCreate', async message => {
     if (message.author.id !== EPICRPG_ID) return;
+    if (message.guildID === '995718781412323338') return;
     if (!message.embeds[0]?.description?.startsWith("**EPIC NPC**: Alright, this time i'm going to use")) return;
 
     const ultrainingField = message.embeds[0].fields?.find(field => field.name.startsWith('ULTRAining'));
