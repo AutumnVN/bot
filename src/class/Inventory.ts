@@ -178,8 +178,8 @@ export class Inventory implements InventoryContent {
 
             const bananaExcess = this.banana - 24999999999;
             this.banana = 24999999999;
-            this.ruby += Math.floor(bananaExcess * 15 * tradeRate.apple / tradeRate.ruby);
-            this.woodenLog += bananaExcess * 15 * tradeRate.apple % tradeRate.ruby;
+            this.ruby += Math.floor(bananaExcess * 12 * tradeRate.apple / tradeRate.ruby);
+            this.woodenLog += bananaExcess * 12 * tradeRate.apple % tradeRate.ruby;
             this.ruby = Math.min(this.ruby, 24999999999);
         }
 
