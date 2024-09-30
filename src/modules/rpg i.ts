@@ -11,8 +11,9 @@ client.on('messageCreate', async message => {
     const id = message.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0];
     if (!id) return;
 
-    const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => m.author.id === id });
-    const isPredictTimePotion = recentUserMessage?.[0]?.content.match(/^rpg i.+t( \d)?$/i);
+    const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => m.author.id === id && m.content.startsWith('rpg i') });
+    const isPredictTimePotion = recentUserMessage?.[0]?.content.match(/^rpg i.+t( \d)?/i);
+    const isHypothetical = recentUserMessage?.[0]?.content.match(/^rpg i.+if (\w+) (\d+)/i);
 
     const user = await prisma.user.findUnique({
         where: { id },
@@ -44,6 +45,25 @@ client.on('messageCreate', async message => {
     if (!normieFish && !goldenFish && !epicFish && !woodenLog && !epicLog && !superLog && !megaLog && !hyperLog && !ultraLog && !apple && !banana && !ruby) return;
 
     const inventory = new Inventory({ normieFish, goldenFish, epicFish, woodenLog, epicLog, superLog, megaLog, hyperLog, ultraLog, apple, banana, ruby, craftProfit: craftProfit(crafterLevel) });
+
+    if (isHypothetical) {
+        const amount = Number(isHypothetical[2]);
+        switch (isHypothetical[1].toLowerCase()) {
+            case 'normiefish': inventory.normieFish = amount; break;
+            case 'goldenfish': inventory.goldenFish = amount; break;
+            case 'epicfish': inventory.epicFish = amount; break;
+            case 'woodenlog': inventory.woodenLog = amount; break;
+            case 'epiclog': inventory.epicLog = amount; break;
+            case 'superlog': inventory.superLog = amount; break;
+            case 'megalog': inventory.megaLog = amount; break;
+            case 'hyperlog': inventory.hyperLog = amount; break;
+            case 'ultralog': inventory.ultraLog = amount; break;
+            case 'apple': inventory.apple = amount; break;
+            case 'banana': inventory.banana = amount; break;
+            case 'ruby': inventory.ruby = amount; break;
+        }
+    }
+
     let content = `${EMOJI.blank} `;
 
     if (Number(maxArea) < 10) {
