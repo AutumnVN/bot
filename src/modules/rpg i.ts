@@ -64,6 +64,7 @@ client.on('messageCreate', async message => {
         const plus = timePotionProfit > 0 ? '+' : '';
         content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
         content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
+        content += inventory.a8BananaCap ? ' ⚠️' : '';
         a10Log = timePotionLog;
         if (isPredictTimePotion) {
             for (let i = 0; i < 9; i++) {
@@ -76,13 +77,10 @@ client.on('messageCreate', async message => {
                 const plus = timePotionProfit > 0 ? '+' : '';
                 content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
                 content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
+                content += inventory.a8BananaCap ? ' ⚠️' : '';
                 a10Log = timePotionLog;
             }
         }
-    }
-
-    if (itemField.split('\n').length < 10 && message.embeds[0].fields?.[1].value.includes('EPIC jump')) {
-        content += '\n⚠️ **Use your __EPIC jump__ before time travel!** ⚠️';
     }
 
     await reply(message, content);
