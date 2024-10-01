@@ -30,7 +30,7 @@ export class Inventory implements InventoryContent {
     banana: number;
     ruby: number;
     craftProfit: number;
-    a8BananaCap = false;
+    logShouldSell = 0;
 
     constructor(content: InventoryContent) {
         this.normieFish = content.normieFish;
@@ -177,8 +177,12 @@ export class Inventory implements InventoryContent {
             this.apple += appleExcess % 15;
             if (this.banana <= 24999999999) return;
 
-            this.a8BananaCap = true;
             const bananaExcess = this.banana - 24999999999;
+
+            if (area === '8') {
+                this.logShouldSell = Math.floor((bananaExcess / this.craftProfit * 15 * 8) / (3.75 * this.craftProfit / 1.25) / (2 * (this.craftProfit / 1.25) ** 2) / 0.075 / (this.craftProfit / 1.25) ** 3);
+            }
+
             this.banana = 24999999999;
             this.ruby += Math.floor(bananaExcess * 12 * tradeRate.apple / tradeRate.ruby);
             this.woodenLog += bananaExcess * 12 * tradeRate.apple % tradeRate.ruby;

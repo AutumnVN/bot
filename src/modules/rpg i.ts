@@ -84,7 +84,7 @@ client.on('messageCreate', async message => {
         const plus = timePotionProfit > 0 ? '+' : '';
         content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
         content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
-        content += inventory.a8BananaCap ? ' ⚠️' : '';
+        content += inventory.logShouldSell > 0 ? ` ⚠️\n${EMOJI.blank} Could sell approximately **${numberFormat(inventory.logShouldSell)}** ${EMOJI.log} at a10+ to avoid a8 banana cap next tt` : '';
         a10Log = timePotionLog;
         if (isPredictTimePotion) {
             for (let i = 0; i < 9; i++) {
@@ -97,7 +97,7 @@ client.on('messageCreate', async message => {
                 const plus = timePotionProfit > 0 ? '+' : '';
                 content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
                 content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
-                content += inventory.a8BananaCap ? ' ⚠️' : '';
+                content += inventory.logShouldSell > 0 ? ' ⚠️' : '';
                 a10Log = timePotionLog;
             }
         }
