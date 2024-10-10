@@ -25,7 +25,7 @@ defineCommand({
         if (!item.pack) return reply(message, `**${itemName}** is not a packable item`);
         if (item.lastUpdate < today0UTC) return reply(message, `Outdated item: **${itemName}**`);
 
-        const workerTokenType = item.type === 'material' ? 'worker tokens' : item.type === 'refined' ? 'rare worker tokens' : 'epic worker tokens';
+        const workerTokenType = item.type === 'material' ? 'worker tokens' : item.type === 'refined' ? 'rare worker tokens' : item.type === 'product' ? 'epic worker tokens' : 'mythic worker tokens';
         let workerToken = 0;
         let leftoverItem = 0;
         let idlon = 0;

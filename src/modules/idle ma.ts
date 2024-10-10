@@ -19,13 +19,14 @@ async function idleMa(message: Message) {
     for (const field of fields) {
         const lastUpdate = Date.now();
 
-        if (/ (box|container|ship)\*\*/.test(field.name)) {
-            const name = field.name.match(/(?<=\*\*).+?(?= (box|container|ship)\*\*)/)?.[0];
+        if (/ (box|container|ship|spaceship)\*\*/.test(field.name)) {
+            const name = field.name.match(/(?<=\*\*).+?(?= (box|container|ship|spaceship)\*\*)/)?.[0];
             if (!name) continue;
 
             const type = field.name.includes(':box:') ? 'material'
                 : field.name.includes(':container:') ? 'refined'
-                    : field.name.includes(':ship:') ? 'product' : undefined;
+                    : field.name.includes(':ship:') ? 'product'
+                        : field.name.includes(':spaceship:') ? 'assembly' : undefined;
             const pack = Number(field.value.match(/(?<=\*\*Price\*\*: )[\d,]+/)?.[0]?.replace(/,/g, ''));
 
             await prisma.idleItem.upsert({
@@ -37,8 +38,7 @@ async function idleMa(message: Message) {
             const name = field.name.match(/(?<=\*\*).+?(?=\*\*)/)?.[0];
             if (!name) continue;
 
-            const type = ['flashlight', 'clock'].includes(name) ? 'assembly'
-                : name.endsWith('scythe') ? 'tool' : undefined;
+            const type = name.endsWith('scythe') ? 'tool' : undefined;
             const note = field.name.match(/⚠️ .+$/)?.[0]?.replace(/\*/g, '') || '';
             const price = Number(field.value.match(/(?<=\*\*Price\*\*: )[\d,]+/)?.[0]?.replace(/,/g, ''));
             const percent = Number(field.value.match(/(?<=`)[+-]?\d+(?=%`)/)?.[0]);
