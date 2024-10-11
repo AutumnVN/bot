@@ -9,7 +9,7 @@ import { prisma } from './Prisma';
 export function codeBlock(content: string, lang = '') {
     if (content === '') content = ' ';
 
-    if (lang === 'ansi') content = removeUselessReset(content);
+    if (lang === 'ansi') content = removeUselessFormat(content);
 
     return `\`\`\`${lang}\n${content.replace(/`{3}/g, '\u200b`\u200b`\u200b`\u200b')}\`\`\``;
 }
@@ -67,8 +67,18 @@ export const pink = ansiFormat('35');
 export const teal = ansiFormat('36');
 export const white = ansiFormat('37');
 
-export function removeUselessReset(content: string) {
-    return content.replace(/\u001b\[0m(?=\s*\u001b\[\d{1,2}m)/g, '');
+function removeUselessFormat(content: string) {
+    return content.replace(/\u001b\[0m(?=\s*\u001b\[\d{1,2}m|$)/g, '')
+        .replace(/(?<=\u001b\[1m.*)\u001b\[1m/g, '')
+        .replace(/(?<=\u001b\[4m.*)\u001b\[4m/g, '')
+        .replace(/(?<=\u001b\[30m.*)\u001b\[30m/g, '')
+        .replace(/(?<=\u001b\[31m.*)\u001b\[31m/g, '')
+        .replace(/(?<=\u001b\[32m.*)\u001b\[32m/g, '')
+        .replace(/(?<=\u001b\[33m.*)\u001b\[33m/g, '')
+        .replace(/(?<=\u001b\[34m.*)\u001b\[34m/g, '')
+        .replace(/(?<=\u001b\[35m.*)\u001b\[35m/g, '')
+        .replace(/(?<=\u001b\[36m.*)\u001b\[36m/g, '')
+        .replace(/(?<=\u001b\[37m.*)\u001b\[37m/g, '');
 }
 
 const intlNumberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
