@@ -39,7 +39,7 @@ async function idleMa(message: Message) {
             if (!name) continue;
 
             const type = name.endsWith('scythe') ? 'tool' : undefined;
-            const note = field.name.match(/⚠️ .+$/)?.[0]?.replace(/\*/g, '') || '';
+            const note = field.name.match(/⚠️ .+$/)?.[0]?.replace(/(\*\*OUT OF STOCK\*\*: |\*\*OVERSTOCKED\*\*: )/g, '') || '';
             const price = Number(field.value.match(/(?<=\*\*Price\*\*: )[\d,]+/)?.[0]?.replace(/,/g, ''));
             const percent = Number(field.value.match(/(?<=`)[+-]?\d+(?=%`)/)?.[0]);
 

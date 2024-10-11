@@ -130,7 +130,7 @@ export function itemList(items: IdleItem[]) {
         const paddedPrice = numberFormat(item.price).padStart(longestPrice, ' ');
         const plus = item.percent > 0 ? '+' : '';
         const paddedPercent = (plus + percentFormat(item.percent / 100)).padStart(longestPercent, ' ');
-        let extremaInLastXDays = '';
+        let extremaInLastXDays = '    ';
         if (item.percentHistory.length > 0) {
             const reversedPercentHistory = item.percentHistory.reverse();
             const uniquePercent = reversedPercentHistory.find(percent => percent !== item.percent);
@@ -143,7 +143,7 @@ export function itemList(items: IdleItem[]) {
             }
         }
 
-        return `${bold(blue(paddedName))}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)}  ${extremaInLastXDays}  ${item.note ?? ''}`;
+        return `${bold(blue(paddedName))}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)}  ${extremaInLastXDays}  ${item.note ?? ''}`.trim();
     }).join('\n');
 
     return codeBlock(content, 'ansi');
