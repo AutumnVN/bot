@@ -124,8 +124,20 @@ export function itemList(items: IdleItem[]) {
         const paddedPrice = numberFormat(item.price).padStart(longestPrice, ' ');
         const plus = item.percent > 0 ? '+' : '';
         const paddedPercent = (plus + percentFormat(item.percent / 100)).padStart(longestPercent, ' ');
+        let extremaInLastXDays = '';
+        if (item.percentHistory.length > 0) {
+            const reversedPercentHistory = item.percentHistory.reverse();
+            const uniquePercent = reversedPercentHistory.find(percent => percent !== item.percent);
+            if (uniquePercent) {
+                const isPeak = item.percent > uniquePercent;
+                const nextExtremaPercent = reversedPercentHistory.find(percent => item.percent && (isPeak ? percent > item.percent : percent < item.percent));
+                const days = nextExtremaPercent ? reversedPercentHistory.indexOf(nextExtremaPercent) + 1 : reversedPercentHistory.length;
+                const paddedDays = days.toString().padStart(2, ' ');
+                extremaInLastXDays = isPeak ? green(`↑${paddedDays}d`) : red(`↓${paddedDays}d`);
+            }
+        }
 
-        return `${bold(blue(paddedName))}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)}  ${item.note ?? ''}`;
+        return `${bold(blue(paddedName))}  ${paddedPrice}  ${colorPrice(item.percent, paddedPercent)}  ${extremaInLastXDays}  ${item.note ?? ''}`;
     }).join('\n');
 
     return codeBlock(content, 'ansi');

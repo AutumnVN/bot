@@ -43,11 +43,25 @@ async function idleMa(message: Message) {
             const price = Number(field.value.match(/(?<=\*\*Price\*\*: )[\d,]+/)?.[0]?.replace(/,/g, ''));
             const percent = Number(field.value.match(/(?<=`)[+-]?\d+(?=%`)/)?.[0]);
 
-            await prisma.idleItem.upsert({
-                where: { name },
-                update: { type, price, percent, note, lastUpdate },
-                create: { name, type, price, percent, note, lastUpdate }
-            });
+            const today0UTC = new Date().setUTCHours(0, 0, 0, 0);
+            const outdated = await prisma.idleItem.findFirst({ where: { name, lastUpdate: { lt: today0UTC } } });
+            if (outdated) {
+                const { percentHistory } = outdated;
+                percentHistory.push(percent);
+                if (percentHistory.length > 99) percentHistory.shift();
+
+                await prisma.idleItem.upsert({
+                    where: { name },
+                    update: { type, price, percent, percentHistory, note, lastUpdate },
+                    create: { name, type, price, percent, percentHistory, note, lastUpdate }
+                });
+            } else {
+                await prisma.idleItem.upsert({
+                    where: { name },
+                    update: { type, price, percent, note, lastUpdate },
+                    create: { name, type, price, percent, note, lastUpdate }
+                });
+            }
         }
     }
 }

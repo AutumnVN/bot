@@ -57,13 +57,14 @@ model IdleLeague {
 }
 
 model IdleItem {
-    name       String  @id @unique
-    pack       Int?
-    type       String?
-    price      Int?
-    percent    Int?
-    note       String?
-    lastUpdate Float?
+    name           String  @id @unique
+    pack           Int?
+    type           String?
+    price          Int?
+    percent        Int?
+    percentHistory Int[]
+    note           String?
+    lastUpdate     Float?
 }
 
 model Reminder {
