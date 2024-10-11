@@ -9,6 +9,8 @@ import { prisma } from './Prisma';
 export function codeBlock(content: string, lang = '') {
     if (content === '') content = ' ';
 
+    if (lang === 'ansi') content = removeUselessReset(content);
+
     return `\`\`\`${lang}\n${content.replace(/`{3}/g, '\u200b`\u200b`\u200b`\u200b')}\`\`\``;
 }
 
@@ -64,6 +66,10 @@ export const blue = ansiFormat('34');
 export const pink = ansiFormat('35');
 export const teal = ansiFormat('36');
 export const white = ansiFormat('37');
+
+export function removeUselessReset(content: string) {
+    return content.replace(/\u001b\[0m(?=\s*\u001b\[\d{1,2}m)/g, '');
+}
 
 const intlNumberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 

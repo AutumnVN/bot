@@ -23,6 +23,7 @@ export default tseslint.config(
         },
         rules: {
             quotes: ['error', 'single', { avoidEscape: true }],
+            'no-control-regex': 'false',
             'simple-import-sort/imports': 'error',
             'simple-import-sort/exports': 'error',
             'unused-imports/no-unused-imports': 'error'
