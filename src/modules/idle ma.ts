@@ -45,9 +45,9 @@ async function idleMa(message: Message) {
 
             const today0UTC = new Date().setUTCHours(0, 0, 0, 0);
             const outdated = await prisma.idleItem.findFirst({ where: { name, lastUpdate: { lt: today0UTC } } });
-            if (outdated) {
+            if (outdated && outdated.percent !== null) {
                 const { percentHistory } = outdated;
-                percentHistory.push(percent);
+                percentHistory.push(outdated.percent);
                 if (percentHistory.length > 99) percentHistory.shift();
 
                 await prisma.idleItem.upsert({
