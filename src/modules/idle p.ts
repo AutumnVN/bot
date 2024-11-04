@@ -1,6 +1,7 @@
 import { client } from '../Client';
 import { IDLEFARM_ID } from '../constants';
 import { prisma } from '../Prisma';
+import { reply } from '../utils';
 
 client.on('messageCreate', async message => {
     if (message.author.id !== IDLEFARM_ID) return;
@@ -13,6 +14,14 @@ client.on('messageCreate', async message => {
     if (!packingField) return;
 
     const pack = Number(packingField.match(/(?<=Lv )\d+/)?.[0]);
+
+    const energyField = message.embeds[0].fields?.find(field => field.name === 'Energy')?.value;
+    if (!energyField) return;
+
+    const energy = Number(energyField.match(/(?<=> )\d+(?=\/)/)?.[0]);
+    if (energy < 120) return;
+
+    await reply(message, `idle raid ${Math.floor(energy / 40)}`);
 
     await prisma.idleProfile.upsert({
         where: { id },
