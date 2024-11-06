@@ -36,7 +36,7 @@ defineCommand({
         const [idleInvWorkerTokenMessage] = await awaitMessages(client, channel, {
             filter: m => m.author.id === IDLEFARM_ID
                 && !!m.embeds[0]?.author?.name.endsWith(' — inventory')
-                && m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id
+                && (m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id || message.author.username === m.embeds[0]?.author?.name.split(' — ')[0])
                 && !!m.embeds[0].fields?.[1]?.value?.includes(`**${workerTokenType}**:`),
             max: 1,
             time: 60000
@@ -51,7 +51,7 @@ defineCommand({
         const [idleInvItemMessage] = await awaitMessages(client, channel, {
             filter: m => (m.author.id === IDLEFARM_ID
                 && !!m.embeds[0]?.author?.name.endsWith(' — inventory')
-                && m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id
+                && (m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id || message.author.username === m.embeds[0]?.author?.name.split(' — ')[0])
                 && !!m.embeds[0].fields?.[1]?.value?.includes(`**${itemName}**:`))
                 || (m.author.id === message.author.id && m.content.toLowerCase() === 'skip'),
             max: 1,
@@ -68,7 +68,7 @@ defineCommand({
         const [idleProfileMessage] = await awaitMessages(client, channel, {
             filter: m => m.author.id === IDLEFARM_ID
                 && !!m.embeds[0]?.author?.name.endsWith(' — profile')
-                && m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id,
+                && (m.embeds[0].author.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] === message.author.id || message.author.username === m.embeds[0]?.author?.name.split(' — ')[0]),
             max: 1,
             time: 60000
         });
