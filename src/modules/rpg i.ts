@@ -12,8 +12,7 @@ client.on('messageCreate', async message => {
     if (!id) return;
 
     const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => m.author.id === id && m.content.startsWith('rpg i') });
-    const isPredictTimePotion = recentUserMessage?.[0]?.content.match(/^rpg i.+t( \d)?/i);
-    const isHypothetical = recentUserMessage?.[0]?.content.match(/^rpg i.+if (\w+) (\d+)/i);
+    const isPredictTimePotion = recentUserMessage?.[0]?.content.match(/^rpg i.+t/i);
 
     const user = await prisma.user.findUnique({
         where: { id },
@@ -25,7 +24,7 @@ client.on('messageCreate', async message => {
     if (!user || !user.profile || !user.profession) return;
 
     const maxArea = getMaxArea(user.profile.maxArea);
-    let crafterLevel = user.profession.crafter;
+    const crafterLevel = user.profession.crafter;
 
     const itemField = message.embeds[0].fields?.[0]?.value;
     if (!itemField) return;
@@ -44,25 +43,7 @@ client.on('messageCreate', async message => {
     const ruby = Number(itemField.match(/(?<=ruby\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
     if (!normieFish && !goldenFish && !epicFish && !woodenLog && !epicLog && !superLog && !megaLog && !hyperLog && !ultraLog && !apple && !banana && !ruby) return;
 
-    const inventory = new Inventory({ normieFish, goldenFish, epicFish, woodenLog, epicLog, superLog, megaLog, hyperLog, ultraLog, apple, banana, ruby, craftProfit: craftProfit(crafterLevel) });
-
-    if (isHypothetical) {
-        const amount = Number(isHypothetical[2]);
-        switch (isHypothetical[1].toLowerCase()) {
-            case 'normiefish': inventory.normieFish = amount; break;
-            case 'goldenfish': inventory.goldenFish = amount; break;
-            case 'epicfish': inventory.epicFish = amount; break;
-            case 'woodenlog': inventory.woodenLog = amount; break;
-            case 'epiclog': inventory.epicLog = amount; break;
-            case 'superlog': inventory.superLog = amount; break;
-            case 'megalog': inventory.megaLog = amount; break;
-            case 'hyperlog': inventory.hyperLog = amount; break;
-            case 'ultralog': inventory.ultraLog = amount; break;
-            case 'apple': inventory.apple = amount; break;
-            case 'banana': inventory.banana = amount; break;
-            case 'ruby': inventory.ruby = amount; break;
-        }
-    }
+    const inventory = new Inventory({ normieFish, goldenFish, epicFish, woodenLog, epicLog, superLog, megaLog, hyperLog, ultraLog, apple, banana, ruby, crafterLevel });
 
     let content = `${EMOJI.blank} `;
 
@@ -77,26 +58,26 @@ client.on('messageCreate', async message => {
     content += `**${numberFormat(a10Log)}** ${EMOJI.log}`;
 
     if (user.profile.timeTravel >= 25) {
-        inventory.timePotion();
-        inventory.tradeToA10('3');
-        const timePotionLog = inventory.total('10');
-        const timePotionProfit = timePotionLog - a10Log;
-        const plus = timePotionProfit > 0 ? '+' : '';
-        content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
-        content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
-        content += inventory.logShouldSell > 0 ? ` ⚠️\n${EMOJI.blank} Could sell approximately **${numberFormat(inventory.logShouldSell)}** ${EMOJI.log} at a10+ to avoid a8 banana cap next tt` : '';
-        a10Log = timePotionLog;
-        if (isPredictTimePotion) {
-            for (let i = 0; i < 9; i++) {
-                crafterLevel += Number(isPredictTimePotion[1]) || 0;
-                inventory.craftProfit = craftProfit(crafterLevel);
+        if (!isPredictTimePotion) {
+            inventory.timePotion();
+            inventory.tradeToA10('3');
+            const timePotionLog = inventory.total('10');
+            const timePotionProfit = timePotionLog - a10Log;
+            const plus = timePotionProfit > 0 ? '+' : '';
+            content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
+            content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
+            content += inventory.logShouldSell > 0 ? ` ⚠️\n${EMOJI.blank} Could sell approximately **${numberFormat(inventory.logShouldSell)}** ${EMOJI.log} at a10+ to avoid a8 banana cap next tt` : '';
+            a10Log = timePotionLog;
+        } else {
+            for (let i = 0; i < 30; i++) {
                 inventory.timePotion();
                 inventory.tradeToA10('3');
                 const timePotionLog = inventory.total('10');
                 const timePotionProfit = timePotionLog - a10Log;
+                if (timePotionProfit / a10Log < 0.01) break;
                 const plus = timePotionProfit > 0 ? '+' : '';
-                content += `\n${EMOJI.potion_time} **${numberFormat(timePotionLog)}** ${EMOJI.log}`;
-                content += ` ${EMOJI.blank} **${plus}${numberFormat(timePotionProfit)}** ${EMOJI.log} (${plus}${percentFormat(timePotionProfit / a10Log)})`;
+                content += `\n${i + 1}. ${numberFormat(timePotionLog)} log`;
+                content += `   ${plus}${numberFormat(timePotionProfit)} log (${plus}${percentFormat(timePotionProfit / a10Log)})`;
                 content += inventory.logShouldSell > 0 ? ' ⚠️' : '';
                 a10Log = timePotionLog;
             }
@@ -117,8 +98,4 @@ function getMaxArea(maxArea: string) {
     return 'TOP';
 }
 
-function craftProfit(crafterLevel: number) {
-    const craftProcChance = Math.min(95, crafterLevel / 1.25) / 100;
-    const craftProcReturn = (12.5 + ((crafterLevel > 100 ? 1 : 0) * 225 * (crafterLevel - 100)) ** 0.2) / 100;
-    return 1 / (1 - craftProcChance * craftProcReturn);
-}
+

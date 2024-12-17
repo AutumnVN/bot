@@ -178,3 +178,32 @@ export function logError(error: unknown) {
 
     send(ERROR_LOG_CHANNEL_ID, codeBlock(error.stack || error.message));
 }
+
+export function prXp(type: string, level: number) {
+    let e = 1;
+    let m = 10;
+    let d = 1;
+
+    if (level >= 100) {
+        level -= 99;
+        m = 100;
+        d = 10;
+
+        switch (type) {
+            case 'worker': e = 1.75; break;
+            case 'crafter': e = 1.85; break;
+            case 'lootboxer': e = 1.9; break;
+            case 'merchant': e = 1.75; break;
+            case 'enchanter': e = 1.95; break;
+        }
+    }
+
+    switch (type) {
+        case 'worker': return Math.ceil((level ** (1.8 ** e) - (level - 1) ** (1.8 ** e)) * m ** (1.8 ** e) / d);
+        case 'crafter': return Math.ceil((level ** (2 ** e) - (level - 1) ** (2 ** e)) * m ** (2 ** e) / d);
+        case 'lootboxer': return Math.ceil((level ** (1.7 ** e) - (level - 1) ** (1.7 ** e)) * m ** (1.7 ** e) / d);
+        case 'merchant': return Math.ceil((level ** (2.05 ** e) - (level - 1) ** (2.05 ** e)) * m ** (2.05 ** e) / d);
+        case 'enchanter': return Math.ceil((level ** (2 ** e) - (level - 1) ** (2 ** e)) * m ** (2 ** e) / d);
+        default: return NaN;
+    }
+}

@@ -1,4 +1,5 @@
 import { TRADE_RATE } from '../constants';
+import { prXp } from '../utils';
 
 interface InventoryContent {
     normieFish: number;
@@ -13,7 +14,7 @@ interface InventoryContent {
     apple: number;
     banana: number;
     ruby: number;
-    craftProfit: number;
+    crafterLevel: number;
 }
 
 export class Inventory implements InventoryContent {
@@ -29,7 +30,8 @@ export class Inventory implements InventoryContent {
     apple: number;
     banana: number;
     ruby: number;
-    craftProfit: number;
+    crafterLevel: number;
+    crafterXp = 0;
     logShouldSell = 0;
 
     constructor(content: InventoryContent) {
@@ -45,7 +47,7 @@ export class Inventory implements InventoryContent {
         this.apple = content.apple;
         this.banana = content.banana;
         this.ruby = content.ruby;
-        this.craftProfit = content.craftProfit;
+        this.crafterLevel = content.crafterLevel;
     }
 
     totalFish() {
@@ -103,10 +105,12 @@ export class Inventory implements InventoryContent {
 
         if (tradeRate.best === 'fish') {
             let logs = this.totalLog(true, true, true, false, false, false) + this.totalApple() * tradeRate.apple;
+            this.addCrafterXp(this.epicLog + this.superLog * 4 + this.banana);
             this.woodenLog = this.epicLog = this.superLog = this.apple = this.banana = 0;
 
             if (area === '3') {
                 logs += this.totalLog(false, false, false, true, true, true);
+                this.addCrafterXp(this.megaLog * 20 + this.hyperLog * 100 + this.ultraLog * 500);
                 this.megaLog = this.hyperLog = this.ultraLog = 0;
             }
 
@@ -121,19 +125,24 @@ export class Inventory implements InventoryContent {
 
             const normieFishExcess = this.normieFish - (24999999999 - 15);
             this.normieFish = 24999999999 - 15;
-            this.goldenFish += Math.floor(normieFishExcess / 15 * this.craftProfit);
+            const goldenFishGain = Math.floor(normieFishExcess / 15 * craftProfit(this.crafterLevel));
+            this.goldenFish += goldenFishGain;
+            this.addCrafterXp(goldenFishGain);
             this.normieFish += normieFishExcess % 15;
             if (this.goldenFish <= 24999999999) return;
 
             const goldenFishExcess = this.goldenFish - (24999999999 - 100);
             this.goldenFish = 24999999999 - 100;
-            this.epicFish += Math.floor(goldenFishExcess / 100 * this.craftProfit);
+            const epicFishGain = Math.floor(goldenFishExcess / 100 * craftProfit(this.crafterLevel));
+            this.epicFish += epicFishGain;
+            this.addCrafterXp(epicFishGain * 12);
             this.goldenFish += goldenFishExcess % 100;
             this.epicFish = Math.min(this.epicFish, 24999999999);
         }
 
         if (tradeRate.best === 'log') {
             const logs = this.totalFish() * tradeRate.fish + this.totalApple() * tradeRate.apple + this.ruby * tradeRate.ruby;
+            this.addCrafterXp(this.goldenFish + this.epicFish * 12 + this.banana);
             this.normieFish = this.goldenFish = this.epicFish = this.apple = this.banana = this.ruby = 0;
 
             this.woodenLog += logs;
@@ -141,29 +150,37 @@ export class Inventory implements InventoryContent {
 
             const woodenLogExcess = this.woodenLog - (24999999999 - 25);
             this.woodenLog = 24999999999 - 25;
-            this.epicLog += Math.floor(woodenLogExcess / 25 * this.craftProfit);
+            const epicLogGain = Math.floor(woodenLogExcess / 25 * craftProfit(this.crafterLevel));
+            this.epicLog += epicLogGain;
+            this.addCrafterXp(epicLogGain);
             this.woodenLog += woodenLogExcess % 25;
             if (this.epicLog <= 24999999999) return;
 
             const epicLogExcess = this.epicLog - (24999999999 - 10);
             this.epicLog = 24999999999 - 10;
-            this.superLog += Math.floor(epicLogExcess / 10 * this.craftProfit);
+            const superLogGain = Math.floor(epicLogExcess / 10 * craftProfit(this.crafterLevel));
+            this.superLog += superLogGain;
+            this.addCrafterXp(superLogGain * 4);
             this.epicLog += epicLogExcess % 10;
             if (this.superLog <= 24999999999) return;
 
             const superLogExcess = this.superLog - (24999999999 - 10);
             this.superLog = 24999999999 - 10;
-            this.megaLog += Math.floor(superLogExcess / 10 * this.craftProfit);
+            const megaLogGain = Math.floor(superLogExcess / 10 * craftProfit(this.crafterLevel));
+            this.megaLog += megaLogGain;
+            this.addCrafterXp(megaLogGain * 20);
             this.superLog += superLogExcess % 10;
             this.megaLog = Math.min(this.megaLog, 24999999999);
         }
 
         if (tradeRate.best === 'apple') {
             let logs = this.totalFish() * tradeRate.fish + this.totalLog(true, true, true, true, true, false) + this.ruby * tradeRate.ruby;
+            this.addCrafterXp(this.goldenFish + this.epicFish * 12 + this.epicLog + this.superLog * 4 + this.megaLog * 20 + this.hyperLog * 100);
             this.normieFish = this.goldenFish = this.epicFish = this.woodenLog = this.epicLog = this.superLog = this.megaLog = this.hyperLog = this.ruby = 0;
 
             if (area === '5') {
                 logs += this.totalLog(false, false, false, false, false, true);
+                this.addCrafterXp(this.ultraLog * 500);
                 this.ultraLog = 0;
             }
 
@@ -173,14 +190,16 @@ export class Inventory implements InventoryContent {
 
             const appleExcess = this.apple - (24999999999 - 15);
             this.apple = 24999999999 - 15;
-            this.banana += Math.floor(appleExcess / 15 * this.craftProfit);
+            const bananaGain = Math.floor(appleExcess / 15 * craftProfit(this.crafterLevel));
+            this.banana += bananaGain;
+            this.addCrafterXp(bananaGain);
             this.apple += appleExcess % 15;
             if (this.banana <= 24999999999) return;
 
             const bananaExcess = this.banana - 24999999999;
 
             if (area === '8') {
-                this.logShouldSell = Math.floor((bananaExcess / this.craftProfit * 15 * 8) / (3.75 * this.craftProfit / 1.25) / (2 * (this.craftProfit / 1.25) ** 2) / 0.075 / (this.craftProfit / 1.25) ** 3);
+                this.logShouldSell = Math.floor((bananaExcess / craftProfit(this.crafterLevel) * 15 * 8) / (3.75 * craftProfit(this.crafterLevel) / 1.25) / (2 * (craftProfit(this.crafterLevel) / 1.25) ** 2) / 0.075 / (craftProfit(this.crafterLevel) / 1.25) ** 3);
             }
 
             this.banana = 24999999999;
@@ -191,13 +210,28 @@ export class Inventory implements InventoryContent {
 
         if (tradeRate.best === 'ruby') {
             const logs = this.totalFish() * tradeRate.fish + this.totalLog(true, true, true, true, true, false) + this.totalApple() * tradeRate.apple;
+            this.addCrafterXp(this.goldenFish + this.epicFish * 12 + this.epicLog + this.superLog * 4 + this.megaLog * 20 + this.hyperLog * 100 + this.banana);
             this.normieFish = this.goldenFish = this.epicFish = this.woodenLog = this.epicLog = this.superLog = this.megaLog = this.hyperLog = this.apple = this.banana = 0;
             this.ruby += Math.floor(logs / tradeRate.ruby);
             this.woodenLog += logs % tradeRate.ruby;
+        }
+    }
+
+    addCrafterXp(xp: number) {
+        this.crafterXp += xp;
+        while (this.crafterXp >= prXp('crafter', this.crafterLevel)) {
+            this.crafterXp -= prXp('crafter', this.crafterLevel);
+            this.crafterLevel++;
         }
     }
 }
 
 function sevenDotFivePercentOf(item: number) {
     return Math.floor(item * 0.075);
+}
+
+function craftProfit(crafterLevel: number) {
+    const craftProcChance = Math.min(95, crafterLevel / 1.25) / 100;
+    const craftProcReturn = (12.5 + ((crafterLevel > 100 ? 1 : 0) * 225 * (crafterLevel - 100)) ** 0.2) / 100;
+    return 1 / (1 - craftProcChance * craftProcReturn);
 }
