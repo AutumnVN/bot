@@ -42,7 +42,7 @@ client.on('messageCreate', async message => {
         const xp = Number(message.embeds[0].fields[0].value.match(/(?<=XP\*\*: )[\d,]+/)?.[0].replace(/,/g, ''));
         if (!type || !level || !xp) return;
 
-        const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => m.author.id === id && m.content.startsWith('rpg pr') });
+        const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => (m.author.id === id || m.content.includes(id)) && m.content.startsWith('rpg pr') });
         const targetLevel = Number(recentUserMessage?.[0]?.content.match(/(?<=rpg pr \w+ )\d+/)?.[0]);
 
         if (targetLevel && targetLevel <= level) return reply(message, 'Target level must be higher than current level');

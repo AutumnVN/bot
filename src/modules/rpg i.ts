@@ -11,7 +11,7 @@ client.on('messageCreate', async message => {
     const id = message.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] !== '0' ? message.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] : message.guild?.members?.find(member => member.user.username === message.embeds[0]?.author?.name.split(' — ')[0])?.id;
     if (!id) return;
 
-    const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => m.author.id === id && m.content.startsWith('rpg i') });
+    const recentUserMessage = await message.channel?.getMessages({ before: message.id, limit: 1, filter: m => (m.author.id === id || m.content.includes(id)) && m.content.startsWith('rpg i') });
     const isPredictTimePotion = recentUserMessage?.[0]?.content.match(/^rpg i.+t/i);
 
     const user = await prisma.user.findUnique({
