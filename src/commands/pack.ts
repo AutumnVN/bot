@@ -41,7 +41,7 @@ defineCommand({
             max: 1,
             time: 60000
         });
-        if (!idleInvWorkerTokenMessage) return;
+        if (!idleInvWorkerTokenMessage) return send(channelID, 'Timed out');
 
         workerToken = Number(idleInvWorkerTokenMessage.embeds[0].fields?.[1]?.value?.match(new RegExp(`(?<=\\*\\*${workerTokenType}\\*\\*: )[\\d,]+`))?.[0]?.replace(/,/g, ''));
         if (workerToken === 0) return send(channelID, `Out of **${workerTokenType}**`);
@@ -57,7 +57,7 @@ defineCommand({
             max: 1,
             time: 60000
         });
-        if (!idleInvItemMessage) return;
+        if (!idleInvItemMessage) return send(channelID, 'Timed out');
 
         if (idleInvItemMessage.author.id === IDLEFARM_ID) {
             leftoverItem = Number(idleInvItemMessage.embeds[0].fields?.[1]?.value?.match(new RegExp(`(?<=\\*\\*${itemName}\\*\\*: )[\\d,]+`))?.[0]?.replace(/,/g, ''));
@@ -72,7 +72,7 @@ defineCommand({
             max: 1,
             time: 60000
         });
-        if (!idleProfileMessage) return;
+        if (!idleProfileMessage) return send(channelID, 'Timed out');
 
         const currencyField = idleProfileMessage.embeds[0].fields?.find(field => field.name === 'Currencies')?.value;
         if (!currencyField) return;
@@ -113,7 +113,7 @@ defineCommand({
                     max: 1,
                     time: 60000
                 });
-                if (!idleBuyMessage) return;
+                if (!idleBuyMessage) return send(channelID, 'Timed out');
 
                 const cost = Number(idleBuyMessage.content.match(/(?<=successfully bought for )[\d,]+/)?.[0]?.replace(/,/g, ''));
                 idlon -= cost;
@@ -131,7 +131,7 @@ defineCommand({
                 max: 1,
                 time: 60000
             });
-            if (!idlePaMessage) return;
+            if (!idlePaMessage) return send(channelID, 'Timed out');
 
             const boxName = idlePaMessage.content.match(/(?<=successfully converted into .+? \*\*).+?(?=\*\*!)/)?.[0];
             workerToken -= oldBuyAmount / 100;
@@ -145,7 +145,7 @@ defineCommand({
                 max: 1,
                 time: 60000
             });
-            if (!idleSellMessage) return;
+            if (!idleSellMessage) return send(channelID, 'Timed out');
 
             const profit = Number(idleSellMessage.content.match(/(?<=successfully sold for )[\d,]+/)?.[0]?.replace(/,/g, ''));
             idlon += profit;
