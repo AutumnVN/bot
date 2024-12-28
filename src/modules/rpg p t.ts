@@ -34,7 +34,7 @@ client.on('messageCreate', async message => {
             && !!m.embeds[0]?.author?.name?.endsWith(' — inventory')
             && id === (m.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] !== '0' ? m.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] : m.guild?.members?.find(member => member.user.username === m.embeds[0]?.author?.name.split(' — ')[0])?.id),
         max: 1,
-        time: 60000
+        time: 15000
     });
     if (!inventoryMessage) return await send(channelID, 'Timed out');
     let inventory = parseInventoryMessage(inventoryMessage as Message);
@@ -43,6 +43,8 @@ client.on('messageCreate', async message => {
     const tradeRegex = /<:(.+):\d+> x([\d,]+) \n\*\*EPIC NPC\*\*: <:(.+):\d+> x([\d,]+)/i;
 
     while (true) {
+        await send(channelID, 'Debug:\n```json\n' + JSON.stringify(Object.fromEntries(Object.entries(inventory).filter(([, value]) => value !== 0)), null, 2) + '\n```');
+
         switch (maxArea) {
             case '1':
             case '2':
@@ -93,7 +95,7 @@ client.on('messageCreate', async message => {
                 else if (inventory.superLog > 0) await send(channelID, 'rpg dismantle super log all');
                 else if (inventory.epicLog > 0) await send(channelID, 'rpg dismantle epic log all');
                 else if (inventory.woodenLog > 1e3) await send(channelID, 'rpg trade d all');
-                else if (inventory.apple > 25e9 - 1e7) await send(channelID, `rpg craft banana ${Math.min(250e6, Math.ceil((inventory.apple - 25e9 + 1e7) / 15))}`);
+                else if (inventory.apple > 25e9 - 1e6) await send(channelID, `rpg craft banana ${Math.min(250e6, Math.ceil((inventory.apple - 25e9 + 1e7) / 15))}`);
                 else return await send(channelID, 'Done');
                 break;
             case '6':
@@ -103,7 +105,7 @@ client.on('messageCreate', async message => {
                 else if (inventory.normieFish > 0) await send(channelID, 'rpg trade a all');
                 else if (inventory.banana > 0) await send(channelID, 'rpg dismantle banana all');
                 else if (inventory.apple > 0) await send(channelID, 'rpg trade c all');
-                else if (inventory.woodenLog > 25e9 - 1e7) await send(channelID, 'rpg trade f all');
+                else if (inventory.woodenLog > 25e9 - 1e6) await send(channelID, 'rpg trade f all');
                 else return await send(channelID, 'Done');
                 break;
             case '8':
@@ -157,17 +159,15 @@ client.on('messageCreate', async message => {
         const [epicRpgMessage] = await awaitMessages(client, channel, {
             filter: async m => m.author.id === EPICRPG_ID
                 && (!!m.content.match(craftRegex)
-                    || m.embeds[0]?.description === '**EPIC NPC**: Alright! Our trade is done then'
-                    || (!!m.embeds[0]?.author?.name?.endsWith(' — inventory')
-                        && id === (m.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] !== '0' ? m.embeds[0]?.author?.iconURL?.match(/(?<=avatars\/)\d+/)?.[0] : m.guild?.members?.find(member => member.user.username === m.embeds[0]?.author?.name.split(' — ')[0])?.id))),
+                    || m.embeds[0]?.description === '**EPIC NPC**: Alright! Our trade is done then'),
             max: 1,
-            time: 60000
+            time: 15000
         });
         if (!epicRpgMessage) return await send(channelID, 'Timed out');
 
         if (epicRpgMessage.content.match(craftRegex)) {
-            const playerMessage = await message.channel?.getMessages({ before: epicRpgMessage.id, limit: 1, filter: m => m.author.id === id && !!m.content.match(/^rpg (craft|dismantle)/i) });
-            if (!playerMessage?.[0]) return await send(channelID, 'Could not find player craft/dismantle message');
+            const playerMessage = await message.channel?.getMessages({ before: epicRpgMessage.id, limit: 3, filter: m => m.author.id === id && !!m.content.match(/^rpg (craft|dismantle)/i) });
+            if (!playerMessage?.[0]) return await send(channelID, 'Could not find player craft/dismantle message\n```json\n' + JSON.stringify(playerMessage, null, 2) + '\n```');
 
             if (playerMessage[0].content.match(/^rpg craft/i)) {
                 const match = epicRpgMessage.content.match(craftRegex);
@@ -285,8 +285,6 @@ client.on('messageCreate', async message => {
                     inventory.ruby += amountReceived;
                     break;
             }
-        } else {
-            inventory = parseInventoryMessage(epicRpgMessage as Message);
         }
     }
 });
