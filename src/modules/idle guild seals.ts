@@ -7,7 +7,7 @@ client.on('messageCreate', async message => {
     if (!message.embeds[0]?.description?.includes('**SEALS CONTRIBUTED THIS WEEK**:')) return;
 
     const seal = Number(message.embeds[0].description.match(/(?<=\*\*SEALS CONTRIBUTED THIS WEEK\*\*: )\d+/)?.[0]);
-    if (!seal || seal < 7800) return;
+    if (!seal || seal < 7000) return;
 
-    await reply(message, '⚠️ **ALREADY REACHED 7800 SEALS. STOP CONTRIBUTING!** ⚠️');
+    await reply(message, '⚠️ **7000 SEALS REACHED** ⚠️');
 });
