@@ -92,7 +92,7 @@ defineCommand({
             let buyAmount = 0;
 
             try {
-                buyAmount = 100 * Math.min(2000000, workerToken, Math.ceil((idlonGoal - idlon) / profitPerToken), Math.floor(idlon / item.price / 100));
+                buyAmount = 100 * Math.min(5000000, workerToken, Math.ceil((idlonGoal - idlon) / profitPerToken), Math.floor(idlon / item.price / 100));
             } catch (error) {
                 if (!(error instanceof Error)) return;
                 return send(channelID, error.message);
