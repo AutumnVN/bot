@@ -293,18 +293,18 @@ function parseInventoryMessage(message: Message) {
     const itemField = message.embeds[0].fields?.[0]?.value;
     if (!itemField) throw new Error('Item field not found');
 
-    const normieFish = Number(itemField.match(/(?<=normie fish\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const goldenFish = Number(itemField.match(/(?<=golden fish\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const epicFish = Number(itemField.match(/(?<=EPIC fish\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const woodenLog = Number(itemField.match(/(?<=wooden log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const epicLog = Number(itemField.match(/(?<=EPIC log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const superLog = Number(itemField.match(/(?<=SUPER log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const megaLog = Number(itemField.match(/(?<=MEGA log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const hyperLog = Number(itemField.match(/(?<=HYPER log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const ultraLog = Number(itemField.match(/(?<=ULTRA log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const apple = Number(itemField.match(/(?<=apple\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const banana = Number(itemField.match(/(?<=banana\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
-    const ruby = Number(itemField.match(/(?<=ruby\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const normieFish = Number(itemField.match(/(?<=\*\*normie fish\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const goldenFish = Number(itemField.match(/(?<=\*\*golden fish\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const epicFish = Number(itemField.match(/(?<=\*\*EPIC fish\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const woodenLog = Number(itemField.match(/(?<=\*\*wooden log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const epicLog = Number(itemField.match(/(?<=\*\*EPIC log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const superLog = Number(itemField.match(/(?<=\*\*SUPER log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const megaLog = Number(itemField.match(/(?<=\*\*MEGA log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const hyperLog = Number(itemField.match(/(?<=\*\*HYPER log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const ultraLog = Number(itemField.match(/(?<=\*\*ULTRA log\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const apple = Number(itemField.match(/(?<=\*\*apple\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const banana = Number(itemField.match(/(?<=\*\*banana\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
+    const ruby = Number(itemField.match(/(?<=\*\*ruby\*\*: )[\d,]+/)?.[0]?.replace(/,/g, '')) || 0;
 
     return new Inventory({ normieFish, goldenFish, epicFish, woodenLog, epicLog, superLog, megaLog, hyperLog, ultraLog, apple, banana, ruby });
 }
