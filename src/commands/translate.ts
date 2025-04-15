@@ -1,24 +1,9 @@
 import { defineCommand } from '../Command';
 import { reply } from '../utils';
 
-interface Sentence {
-    trans: string;
-    orig: string;
-    backend: number;
-}
-
-interface Ld_result {
-    srclangs: string[];
-    srclangs_confidences: number[];
-    extended_srclangs: string[];
-}
-
 interface Response {
-    sentences: Sentence[];
-    src: string;
-    confidence: number;
-    spell: object;
-    ld_result: Ld_result;
+    translation: string;
+    sourceLanguage: string;
 }
 
 defineCommand({
@@ -30,8 +15,15 @@ defineCommand({
     async run(message, [text]) {
         if (!text) return;
 
-        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=vi&dt=t&dj=1&q=${encodeURIComponent(text)}`).then(res => res.json()) as Response;
-
-        await reply(message, res.sentences.map(s => s?.trans).filter(Boolean).join(''));
+        const url = 'https://translate-pa.googleapis.com/v1/translate?' + new URLSearchParams({
+            'params.client': 'gtx',
+            'dataTypes': 'TRANSLATION',
+            'key': 'AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA',
+            'query.sourceLanguage': 'auto',
+            'query.targetLanguage': 'vi',
+            'query.text': text,
+        });
+        const res = await fetch(url).then(res => res.json()) as Response;
+        await reply(message, res.translation);
     }
 });
